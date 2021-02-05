@@ -127,6 +127,8 @@ mod linux {
                         if let Err(old) = self.0.value.compare_exchange(RUNNING_NO_WAIT, RUNNING_WAITING, Ordering::AcqRel, Ordering::Acquire) {
                             // reuse expensive load
                             state = old;
+                        } else {
+                            state = RUNNING_WAITING;
                         }
 
                         // TODO: is it worth spinning a bit?
