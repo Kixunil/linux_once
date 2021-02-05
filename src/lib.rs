@@ -122,7 +122,7 @@ mod linux {
                     COMPLETE => break,
                     POISONED => panic!("Once instance has previously been poisoned"),
                     // we have two versions of running to optimize a bit
-                    running => {
+                    _running => {
                         // Signal that there's at least one thread waiting
                         if let Err(old) = self.0.value.compare_exchange(RUNNING_NO_WAIT, RUNNING_WAITING, Ordering::AcqRel, Ordering::Acquire) {
                             // reuse expensive load
@@ -136,7 +136,7 @@ mod linux {
                         // actual waiting logic
                         while state >= RUNNING_NO_WAIT {
                             // We need to check the value regardless, o we just ignore the error
-                            let _ = self.0.wait(running);
+                            let _ = self.0.wait(state);
                             state = self.0.value.load(Ordering::Acquire);
                         }
                         break;
